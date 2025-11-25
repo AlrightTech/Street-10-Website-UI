@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useRef } from "react";
+import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
@@ -64,17 +65,19 @@ function CarCircle() {
       >
         {carImages.map((car, index) => (
           <SwiperSlide key={index}>
-            <div className="w-[130px] h-[130px] rounded-full p-1 bg-gradient-to-r from-[#766CDF] via-[#B78BB2] to-[#DD9F84] flex items-center justify-center mx-auto">
-              <div className="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                <Image
-                  src={car.src}
-                  alt={car.alt}
-                  width={130}
-                  height={130}
-                  className="object-cover w-full h-full"
-                />
+            <Link href="/car-preview" className="block">
+              <div className="w-[130px] h-[130px] rounded-full p-1 bg-gradient-to-r from-[#766CDF] via-[#B78BB2] to-[#DD9F84] flex items-center justify-center mx-auto cursor-pointer hover:scale-110 transition-transform">
+                <div className="w-full h-full rounded-full overflow-hidden border-2 border-white">
+                  <Image
+                    src={car.src}
+                    alt={car.alt}
+                    width={130}
+                    height={130}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
               </div>
-            </div>
+            </Link>
           </SwiperSlide>
         ))}
       </Swiper>

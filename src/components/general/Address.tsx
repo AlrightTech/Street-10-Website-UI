@@ -1,13 +1,24 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import { FaPlus, FaMinus, FaTrash } from "react-icons/fa";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { IoLocationOutline } from "react-icons/io5";
 import { MdOutlineArrowDownward } from "react-icons/md";
 import Link from "next/link";
+import { Loader } from "../ui/loader";
 
 const Address = () => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    // Simulate form submission
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setLoading(false);
+    // Navigation will happen via Link
+  };
+
   return (
     <div className="w-full min-h-screen bg-gray-50 p-6">
       <h2 className="text-2xl font-semibold flex gap-3 items-center mb-6">
@@ -108,13 +119,27 @@ const Address = () => {
 
             {/* Buttons */}
             <div className="flex justify-end gap-4 pt-4">
-              <button className="  text-[#000000] py-3 rounded-lg bg-[#F3F5F6] px-5 cursor-pointer font-semibold ">
-                Cancel
-              </button>
-              <Link href={"/order-preview"}>
-                <button className=" bg-[#EE8E32] flex gap-2 items-center text-white py-3 rounded-lg px-5 cursor-pointer font-semibold ">
-                  Submit & Pay
-                  <MdOutlineArrowDownward color="white" size={20} />
+              <Link href="/e-commerce">
+                <button className="text-[#000000] py-3 rounded-lg bg-[#F3F5F6] px-5 cursor-pointer font-semibold hover:bg-gray-200 transition">
+                  Cancel
+                </button>
+              </Link>
+              <Link href={"/order-preview"} onClick={handleSubmit}>
+                <button
+                  disabled={loading}
+                  className="bg-[#EE8E32] flex gap-2 items-center justify-center text-white py-3 rounded-lg px-5 cursor-pointer font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <>
+                      <Loader size="sm" color="#ffffff" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      Submit & Pay
+                      <MdOutlineArrowDownward color="white" size={20} />
+                    </>
+                  )}
                 </button>
               </Link>
             </div>

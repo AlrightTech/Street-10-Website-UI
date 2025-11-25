@@ -6,6 +6,7 @@ import { CiCircleMinus } from "react-icons/ci";
 import AboutCar from "./AboutCar";
 import CarInfo from "./CarInfo";
 import Address from "./Address";
+import { Loader } from "../ui/loader";
 
 interface Car {
   id: number;
@@ -21,9 +22,15 @@ const CarPreview: React.FC<{ car: Car }> = ({ car }) => {
   const [selectedImage, setSelectedImage] = useState(car.images[0]);
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1); // 1=verify, 2=deposit, 3=amount
   const [bidStep, setBidStep] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
+  const [loading, setLoading] = useState(false);
+  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   // 0=normal images, 1=red preview, 2=number plate preview, 3=back to normal after bid
 
-  const handlePlaceBid = () => {
+  const handlePlaceBid = async () => {
+    setLoading(true);
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    
     if (bidStep === 0) {
       setBidStep(1);
     } else if (bidStep === 1) {
@@ -37,6 +44,21 @@ const CarPreview: React.FC<{ car: Car }> = ({ car }) => {
       setBidStep(5);
       setStep(5);
     }
+    setLoading(false);
+  };
+
+  const handleVerify = async () => {
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setStep(2);
+    setLoading(false);
+  };
+
+  const handlePayDeposit = async () => {
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setStep(3);
+    setLoading(false);
   };
 
   return (
@@ -157,10 +179,12 @@ const CarPreview: React.FC<{ car: Car }> = ({ car }) => {
                       You must verify your account first
                     </p>
                     <button
-                      onClick={() => setStep(2)}
-                      className="bg-[#ee8e31] cursor-pointer text-white w-full py-3 rounded-lg font-semibold"
+                      onClick={handleVerify}
+                      disabled={loading}
+                      className="bg-[#ee8e31] cursor-pointer text-white w-full py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                      Verify account
+                      {loading ? <Loader size="sm" color="#ffffff" /> : null}
+                      {loading ? "Verifying..." : "Verify account"}
                     </button>
                   </div>
                 )}
@@ -171,10 +195,12 @@ const CarPreview: React.FC<{ car: Car }> = ({ car }) => {
                       You have to pay a deposit to be able to bid on any item
                     </p>
                     <button
-                      onClick={() => setStep(3)}
-                      className="bg-[#ee8e31] cursor-pointer text-white w-full py-3 rounded-lg font-semibold"
+                      onClick={handlePayDeposit}
+                      disabled={loading}
+                      className="bg-[#ee8e31] cursor-pointer text-white w-full py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                      Pay Deposit (200 QAR)
+                      {loading ? <Loader size="sm" color="#ffffff" /> : null}
+                      {loading ? "Processing..." : "Pay Deposit (200 QAR)"}
                     </button>
                   </div>
                 )}
@@ -188,7 +214,12 @@ const CarPreview: React.FC<{ car: Car }> = ({ car }) => {
                       {[600, 700, 800, 900].map((amt) => (
                         <span
                           key={amt}
-                          className="px-4 py-2 bg-[#fdf4eb] rounded-full cursor-pointer hover:bg-[#ee8e31] hover:text-white text-[#ee8e31] text-sm"
+                          onClick={() => setSelectedAmount(amt)}
+                          className={`px-4 py-2 rounded-full cursor-pointer hover:bg-[#ee8e31] hover:text-white text-sm transition ${
+                            selectedAmount === amt
+                              ? "bg-[#ee8e31] text-white"
+                              : "bg-[#fdf4eb] text-[#ee8e31]"
+                          }`}
                         >
                           {amt} QAR
                         </span>
@@ -208,9 +239,11 @@ const CarPreview: React.FC<{ car: Car }> = ({ car }) => {
                     </p>
                     <button
                       onClick={handlePlaceBid}
-                      className="bg-[#ee8e31] cursor-pointer text-white w-full py-3 rounded-lg font-semibold"
+                      disabled={loading}
+                      className="bg-[#ee8e31] cursor-pointer text-white w-full py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                      Place your bid
+                      {loading ? <Loader size="sm" color="#ffffff" /> : null}
+                      {loading ? "Placing bid..." : "Place your bid"}
                     </button>
                   </div>
                 )}
@@ -243,9 +276,11 @@ const CarPreview: React.FC<{ car: Car }> = ({ car }) => {
                     <div className="px-5 py-8 bg-white rounded-xl mt-8">
                       <button
                         onClick={handlePlaceBid}
-                        className="bg-[#ee8e31] cursor-pointer text-white w-full py-3 rounded-lg font-semibold"
+                        disabled={loading}
+                        className="bg-[#ee8e31] cursor-pointer text-white w-full py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
-                        Buy now for 600 QAR
+                        {loading ? <Loader size="sm" color="#ffffff" /> : null}
+                        {loading ? "Processing..." : "Buy now for 600 QAR"}
                       </button>
                     </div>
                   </>
