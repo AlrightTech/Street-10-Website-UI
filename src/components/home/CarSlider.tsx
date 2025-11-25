@@ -11,6 +11,7 @@ import {
   MdKeyboardArrowRight,
 } from "react-icons/md";
 import Image from "next/image";
+import Link from "next/link";
 import CategoriesSlider from "../general/CategoriesSlider";
 const cars = [
   {
@@ -84,7 +85,10 @@ function CarSlider() {
         >
           {cars.map((car, index) => (
             <SwiperSlide key={index}>
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full">
+              <Link
+                href="/car-preview"
+                className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full hover:shadow-xl transition-shadow cursor-pointer block"
+              >
                 {/* Image Section */}
                 <div className="relative w-full flex-shrink-0">
                   <Image
@@ -96,7 +100,7 @@ function CarSlider() {
                   />
 
                   {/* Top-right badges */}
-                  <div className="flex gap-2 absolute top-3 right-3 md:top-4 md:right-4">
+                  <div className="flex gap-2 absolute top-3 right-3 md:top-4 md:right-4 pointer-events-none z-10">
                     <Image
                       src={"/icons/frwrd.svg"}
                       alt="forward"
@@ -115,7 +119,7 @@ function CarSlider() {
                       className="absolute top-14 left-1/2 transform -translate-x-1/2
                       flex flex-col sm:flex-row items-center justify-between 
                       
-                       w-[90%] sm:w-[85%] lg:w-[80%]"
+                       w-[90%] sm:w-[85%] lg:w-[80%] pointer-events-none z-10"
                     >
                       <Image
                         src={"/images/street/FrameSlider.svg"}
@@ -130,7 +134,7 @@ function CarSlider() {
                     className="absolute bottom-3 left-1/2 transform -translate-x-1/2
                       flex flex-col sm:flex-row items-center justify-between gap-4
                       px-4 py-3 sm:px-6 sm:py-4 rounded-lg text-white
-                      bg-white/20 backdrop-blur-md shadow-lg w-[90%] sm:w-[85%] lg:w-[80%]"
+                      bg-white/20 backdrop-blur-md shadow-lg w-[90%] sm:w-[85%] lg:w-[80%] pointer-events-none z-10"
                   >
                     <div className="text-center sm:text-left">
                       <p className="text-xs sm:text-sm">Auction ends</p>
@@ -157,7 +161,7 @@ function CarSlider() {
                     ))}
                   </div>
                 </div>
-              </div>
+              </Link>
             </SwiperSlide>
           ))}
         </Swiper>
@@ -180,9 +184,11 @@ function CarSlider() {
       </section>
 
       <div className="flex justify-center my-10">
-        <button className="bg-[#EE8E32] cursor-pointer transition px-8 py-3 rounded-lg text-white font-semibold flex items-center gap-2">
-          Explore more <FaArrowDown className="animate-bounce" />
-        </button>
+        <Link href="/bidding">
+          <button className="bg-[#EE8E32] cursor-pointer transition px-8 py-3 rounded-lg text-white font-semibold flex items-center gap-2 hover:bg-[#d67a1f]">
+            Explore more <FaArrowDown className="animate-bounce" />
+          </button>
+        </Link>
       </div>
     </>
   );

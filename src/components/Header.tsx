@@ -235,15 +235,17 @@ const Header = () => {
       {/* Right Section */}
       <div className="flex items-center gap-4">
         {/* Search */}
-        <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 cursor-pointer">
-          <Image
-            className="w-5 h-5 "
-            src={"/icons/search.svg"}
-            alt={"icon"}
-            width={20}
-            height={20}
-          />
-        </div>
+        <Link href="/bidding">
+          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 cursor-pointer hover:bg-gray-200 transition">
+            <Image
+              className="w-5 h-5 "
+              src={"/icons/search.svg"}
+              alt={"icon"}
+              width={20}
+              height={20}
+            />
+          </div>
+        </Link>
 
         <div ref={bellRef} className="relative">
           <div

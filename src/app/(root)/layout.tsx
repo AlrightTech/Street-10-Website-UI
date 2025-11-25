@@ -1,15 +1,24 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import TopHeader from "@/components/home/TopHeader";
 import Footer from "@/components/Footer";
 import { usePathname } from "next/navigation";
+import { PageLoader } from "@/components/ui/loader";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, [pathname]);
 
   return (
     <div className="relative h-screen flex flex-col">
+      {loading && <PageLoader />}
       <header>
         {/* TopHeader only on "/" */}
         {pathname === "/" && <TopHeader />}

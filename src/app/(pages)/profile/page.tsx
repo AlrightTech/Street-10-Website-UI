@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import Link from "next/link";
 import { CiBookmark } from "react-icons/ci";
 
 import { FaRegUser } from "react-icons/fa";
@@ -45,31 +46,37 @@ export default function Profile() {
           </div>
 
           {/* Profile Setting */}
-          <div className="flex justify-between items-center bg-[#ffffff] px-4 py-5 rounded-md cursor-pointer hover:bg-gray-100">
-            <div className="flex items-center gap-3 text-[#666666]">
-              <FaRegUser size={16} />
-              <span>Profile Setting</span>
+          <Link href="/profile">
+            <div className="flex justify-between items-center bg-[#ffffff] px-4 py-5 rounded-md cursor-pointer hover:bg-gray-100">
+              <div className="flex items-center gap-3 text-[#666666]">
+                <FaRegUser size={16} />
+                <span>Profile Setting</span>
+              </div>
+              <MdKeyboardArrowRight color="#666666" size={20} />
             </div>
-            <MdKeyboardArrowRight color="#666666" size={20} />
-          </div>
+          </Link>
 
           {/* Bidding History */}
-          <div className="flex justify-between items-center bg-[#ffffff] px-4 py-5 rounded-md cursor-pointer hover:bg-gray-100">
-            <div className="flex items-center gap-3 text-[#666666]">
-              <GoHistory size={16} />
-              <span>Bidding History</span>
+          <Link href="/bidding">
+            <div className="flex justify-between items-center bg-[#ffffff] px-4 py-5 rounded-md cursor-pointer hover:bg-gray-100">
+              <div className="flex items-center gap-3 text-[#666666]">
+                <GoHistory size={16} />
+                <span>Bidding History</span>
+              </div>
+              <MdKeyboardArrowRight color="#666666" size={20} />
             </div>
-            <MdKeyboardArrowRight color="#666666" size={20} />
-          </div>
+          </Link>
 
           {/* Order History */}
-          <div className="flex justify-between items-center bg-[#ffffff] px-4 py-5 rounded-md cursor-pointer hover:bg-gray-100">
-            <div className="flex items-center gap-3 text-[#666666]">
-              <LuClock9 size={16} />
-              <span>Order History</span>
+          <Link href="/order-history">
+            <div className="flex justify-between items-center bg-[#ffffff] px-4 py-5 rounded-md cursor-pointer hover:bg-gray-100">
+              <div className="flex items-center gap-3 text-[#666666]">
+                <LuClock9 size={16} />
+                <span>Order History</span>
+              </div>
+              <MdKeyboardArrowRight color="#666666" size={20} />
             </div>
-            <MdKeyboardArrowRight color="#666666" size={20} />
-          </div>
+          </Link>
 
           {/* Saved Items */}
           <div className="flex justify-between items-center bg-[#ffffff] px-4 py-5 rounded-md cursor-pointer hover:bg-gray-100">

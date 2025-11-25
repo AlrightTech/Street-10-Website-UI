@@ -11,6 +11,7 @@ import {
   MdKeyboardArrowRight,
 } from "react-icons/md";
 import Image from "next/image";
+import Link from "next/link";
 import CategoriesSlider from "../general/CategoriesSlider";
 const cars = [
   {
@@ -85,7 +86,10 @@ function CarSlider() {
         >
           {cars.map((car, index) => (
             <SwiperSlide key={index}>
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full">
+              <Link
+                href="/car-preview"
+                className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full hover:shadow-xl transition-shadow cursor-pointer block"
+              >
                 <div className="relative w-full flex-shrink-0">
                   <Image
                     src={car.src}
@@ -94,7 +98,7 @@ function CarSlider() {
                     height={250}
                     className="w-full h-56 md:h-64 lg:h-72 object-cover"
                   />
-                  <div className="flex gap-2 absolute top-3 right-3 md:top-4 md:right-4">
+                  <div className="flex gap-2 absolute top-3 right-3 md:top-4 md:right-4 pointer-events-none z-10">
                     <Image
                       src={"/icons/frwrd.svg"}
                       alt="forward"
@@ -124,7 +128,7 @@ function CarSlider() {
                     ))}
                   </div>
                 </div>
-              </div>
+              </Link>
             </SwiperSlide>
           ))}
         </Swiper>
@@ -147,9 +151,11 @@ function CarSlider() {
       </section>
 
       <div className="flex justify-center my-10">
-        <button className="bg-[#EE8E32] cursor-pointer transition px-8 py-3 rounded-lg text-white font-semibold flex items-center gap-2">
-          Explore more <FaArrowDown className="animate-bounce" />
-        </button>
+        <Link href="/e-commerce">
+          <button className="bg-[#EE8E32] cursor-pointer transition px-8 py-3 rounded-lg text-white font-semibold flex items-center gap-2 hover:bg-[#d67a1f]">
+            Explore more <FaArrowDown className="animate-bounce" />
+          </button>
+        </Link>
       </div>
     </>
   );

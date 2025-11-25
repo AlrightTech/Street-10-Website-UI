@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import Link from "next/link";
 import { IoIosArrowRoundForward } from "react-icons/io";
 
 function Page() {
@@ -52,13 +53,17 @@ function Page() {
             </div>
           </div>
           <div className="flex justify-end gap-4 pt-6">
-            <button className="  text-[#000000] py-3 rounded-lg bg-[#F3F5F6] px-5 cursor-pointer font-semibold ">
-              Cancel
-            </button>
-            <button className=" bg-[#EE8E32] flex gap-2 items-center text-white py-3 rounded-lg px-5 cursor-pointer font-semibold ">
-              Checkout
-              <IoIosArrowRoundForward color="white" size={20} />
-            </button>
+            <Link href="/e-commerce">
+              <button className="  text-[#000000] py-3 rounded-lg bg-[#F3F5F6] px-5 cursor-pointer font-semibold hover:bg-gray-200 transition">
+                Cancel
+              </button>
+            </Link>
+            <Link href="/payment">
+              <button className=" bg-[#EE8E32] flex gap-2 items-center text-white py-3 rounded-lg px-5 cursor-pointer font-semibold hover:bg-[#d67a1f] transition">
+                Checkout
+                <IoIosArrowRoundForward color="white" size={20} />
+              </button>
+            </Link>
           </div>
         </div>
 
