@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
@@ -13,36 +13,8 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import CategoriesSlider from "../general/CategoriesSlider";
-const cars = [
-  {
-    src: "/images/street/simpleSlider-1.jpg",
-    bid: "40,000 QAR",
-    end: "4d : 12h : 8m",
-    plate: "Plat no. 12345#",
-    provider: ["Provided by us", "Automatic", "1600 CC"],
-  },
-  {
-    src: "/images/street/simpleSlider-2.jpg",
-    bid: "55,000 QAR",
-    end: "2d : 05h : 30m",
-    plate: "Plat no. 67890#",
-    provider: ["Provided by us", "Manual", "2000 CC"],
-  },
-  {
-    src: "/images/street/simpleSlider-3.jpg",
-    bid: "62,000 QAR",
-    end: "6d : 20h : 15m",
-    plate: "Plat no. 54321#",
-    provider: ["Provided by us", "Automatic", "1800 CC"],
-  },
-  {
-    src: "/images/cars/car-4.jpg",
-    bid: "75,000 QAR",
-    end: "1d : 14h : 05m",
-    plate: "Plat no. 24680#",
-    provider: ["Provided by us", "Automatic", "2200 CC"],
-  },
-];
+import { homeApi } from "@/services/home.api";
+import type { Product } from "@/services/product.api";
 
 const category = [
   { title: "", icon: "/icons/categories.svg" },
@@ -55,9 +27,52 @@ const category = [
   { title: "Spare Parts", icon: "/icons/spareParts.svg" },
 ];
 
-function CarSlider() {
+interface SimpleCarSliderProps {
+  type?: "products" | "vendor";
+}
+
+function CarSlider({ type = "products" }: SimpleCarSliderProps) {
   const [prevEl, setPrevEl] = useState<HTMLDivElement | null>(null);
   const [nextEl, setNextEl] = useState<HTMLDivElement | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response =
+          type === "vendor"
+            ? await homeApi.getVendorOfferings(10)
+            : await homeApi.getFeaturedProducts(10);
+        setProducts(response.data || []);
+      } catch (error) {
+        console.error(`Error fetching ${type} products:`, error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [type]);
+
+  // Transform product data to match the car format
+  const cars = products.map((product) => {
+    const price = parseFloat(product.priceMinor) / 100;
+    return {
+      id: product.id,
+      src: product.media?.[0]?.url || "/images/street/simpleSlider-1.jpg",
+      bid: `${price.toLocaleString()} QAR`,
+      end: "Available",
+      plate: product.title || "Product",
+      provider: [
+        "Provided by us",
+        product.categories?.[0]?.name || "General",
+        "In Stock",
+      ],
+    };
+  });
 
   return (
     <>
@@ -84,53 +99,67 @@ function CarSlider() {
             }
           }}
         >
-          {cars.map((car, index) => (
-            <SwiperSlide key={index}>
-              <Link
-                href="/car-preview"
-                className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full hover:shadow-xl transition-shadow cursor-pointer block"
-              >
-                <div className="relative w-full flex-shrink-0">
-                  <Image
-                    src={car.src}
-                    alt={`Car ${index + 1}`}
-                    width={400}
-                    height={250}
-                    className="w-full h-56 md:h-64 lg:h-72 object-cover"
-                  />
-                  <div className="flex gap-2 absolute top-3 right-3 md:top-4 md:right-4 pointer-events-none z-10">
-                    <Image
-                      src={"/icons/frwrd.svg"}
-                      alt="forward"
-                      width={36}
-                      height={36}
-                    />
-                    <Image
-                      src={"/icons/badge-1.svg"}
-                      alt="badge"
-                      width={36}
-                      height={36}
-                    />
-                  </div>
-                </div>
-                <div className="p-4 border-t mt-auto flex flex-col justify-between">
-                  <p className="text-[#333333] font-medium mb-2 sm:mb-3 text-sm sm:text-base">
-                    {car.plate}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {car.provider.map((info, idx) => (
-                      <span
-                        key={idx}
-                        className="px-3 py-1 text-xs sm:text-sm bg-white rounded-full text-[#666666] shadow-[0px_1px_4px_0px_#0000001A]"
-                      >
-                        {info}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </Link>
+          {loading ? (
+            <SwiperSlide>
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full p-4">
+                <div className="animate-pulse">Loading...</div>
+              </div>
             </SwiperSlide>
-          ))}
+          ) : cars.length > 0 ? (
+            cars.map((car, index) => (
+              <SwiperSlide key={car.id || index}>
+                <Link
+                  href={`/car-preview?id=${car.id}&type=product`}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full hover:shadow-xl transition-shadow cursor-pointer"
+                >
+                  <div className="relative w-full flex-shrink-0">
+                    <Image
+                      src={car.src}
+                      alt={`Car ${index + 1}`}
+                      width={400}
+                      height={250}
+                      className="w-full h-56 md:h-64 lg:h-72 object-cover"
+                    />
+                    <div className="flex gap-2 absolute top-3 right-3 md:top-4 md:right-4 pointer-events-none z-10">
+                      <Image
+                        src={"/icons/frwrd.svg"}
+                        alt="forward"
+                        width={36}
+                        height={36}
+                      />
+                      <Image
+                        src={"/icons/badge-1.svg"}
+                        alt="badge"
+                        width={36}
+                        height={36}
+                      />
+                    </div>
+                  </div>
+                  <div className="p-4 border-t mt-auto flex flex-col justify-between">
+                    <p className="text-[#333333] font-medium mb-2 sm:mb-3 text-sm sm:text-base">
+                      {car.plate}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {car.provider.map((info, idx) => (
+                        <span
+                          key={idx}
+                          className="px-3 py-1 text-xs sm:text-sm bg-white rounded-full text-[#666666] shadow-[0px_1px_4px_0px_#0000001A]"
+                        >
+                          {info}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </Link>
+              </SwiperSlide>
+            ))
+          ) : (
+            <SwiperSlide>
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full p-4">
+                <p className="text-gray-500">No products available</p>
+              </div>
+            </SwiperSlide>
+          )}
         </Swiper>
 
         {/* Navigation Arrows */}

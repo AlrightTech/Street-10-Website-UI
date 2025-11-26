@@ -1,10 +1,21 @@
 "use client";
 import { useState, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { authApi } from "@/services/auth.api";
+import { toast } from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/redux/authSlice";
 
 export default function AuthPage() {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
+  const [loading, setLoading] = useState(false);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const phone = searchParams.get("phone");
+  const email = searchParams.get("email");
+  const dispatch = useDispatch();
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return; // Only allow digits
@@ -28,10 +39,56 @@ export default function AuthPage() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const otpCode = otp.join("");
-    console.log("OTP entered:", otpCode);
-    // Add your verification logic here
+    if (otpCode.length !== 6) {
+      toast.error("Please enter the complete 6-digit code");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await authApi.verifyOTP({
+        code: otpCode,
+        phone: phone || undefined,
+        email: email || undefined,
+      });
+
+      if (response.success && response.data) {
+        localStorage.setItem("token", response.data.token);
+        dispatch(
+          setUser({
+            id: parseInt(response.data.user.id) || 0,
+            first_name: "",
+            last_name: "",
+            email: response.data.user.email,
+            email_verified_at: "",
+            created_at: "",
+            updated_at: "",
+            role: response.data.user.role as "user" | "admin",
+            avatar: "",
+            status: response.data.user.status as "0" | "1",
+            otp: null,
+            otp_expires_at: null,
+            add_interest: [],
+            bible_version: "",
+            age: "",
+            is_profile_complete: "No",
+            token: response.data.token,
+          })
+        );
+        toast.success("Login successful!");
+        router.push("/");
+      }
+    } catch (error: unknown) {
+      console.error("Error verifying OTP:", error);
+      const errorMessage = error && typeof error === 'object' && 'response' in error 
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message 
+        : undefined;
+      toast.error(errorMessage || "Invalid OTP code");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,8 +108,9 @@ export default function AuthPage() {
       <div className="w-full md:w-1/2 flex flex-col justify-center px-8 md:px-20">
         <h1 className="font-semibold text-xl text-black">6 digit code sent!</h1>
         <h3 className="text-[#666666] text-md mb-6 font-semibold mt-2">
-          We&apos;ve sent an OTP to your number (XX238), please enter the code
-          here
+          We&apos;ve sent an OTP to your{" "}
+          {phone ? `number (${phone})` : email ? `email (${email})` : "contact"}
+          , please enter the code here
         </h3>
 
         <div className="flex  justify-between mb-6">
@@ -75,9 +133,10 @@ export default function AuthPage() {
 
         <button
           onClick={handleSubmit}
-          className="w-full cursor-pointer bg-[#ee8e31] text-white py-2 rounded-md font-semibold"
+          disabled={loading}
+          className="w-full cursor-pointer bg-[#ee8e31] text-white py-2 rounded-md font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Verify
+          {loading ? "Verifying..." : "Verify"}
         </button>
       </div>
     </div>

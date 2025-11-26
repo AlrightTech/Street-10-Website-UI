@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -10,15 +10,48 @@ import {
   MdOutlineKeyboardArrowLeft,
   MdKeyboardArrowRight,
 } from "react-icons/md";
+import { categoryApi } from "@/services/category.api";
+import type { Category } from "@/services/category.api";
+
 interface CategoriesSliderProps {
-  category: {
+  category?: {
     icon: string;
     title?: string;
   }[];
+  useApi?: boolean;
 }
-function CategoriesSlider({ category }: CategoriesSliderProps) {
+
+function CategoriesSlider({
+  category: propCategory,
+  useApi = false,
+}: CategoriesSliderProps) {
   const [prevEl, setPrevEl] = useState<HTMLDivElement | null>(null);
   const [nextEl, setNextEl] = useState<HTMLDivElement | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    if (useApi) {
+      const fetchCategories = async () => {
+        try {
+          const response = await categoryApi.getTree();
+          setCategories(response.data || []);
+        } catch (error) {
+          console.error("Error fetching categories:", error);
+          setCategories([]);
+        }
+      };
+
+      fetchCategories();
+    }
+  }, [useApi]);
+
+  // Use API categories if useApi is true, otherwise use prop categories
+  const category = useApi
+    ? categories.map((cat) => ({
+        icon: cat.icon || "/icons/categories.svg",
+        title: cat.name,
+      }))
+    : propCategory || [];
   return (
     <div className="relative w-full">
       <div className="flex items-center justify-center">

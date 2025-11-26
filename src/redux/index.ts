@@ -1,5 +1,9 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import userReducer from "./authSlice";
+import productReducer from "./productSlice";
+import auctionReducer from "./auctionSlice";
+import categoryReducer from "./categorySlice";
+import orderReducer from "./orderSlice";
 import storage from "redux-persist/lib/storage";
 import logger from "redux-logger";
 
@@ -43,6 +47,10 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   user: userReducer,
+  products: productReducer,
+  auctions: auctionReducer,
+  categories: categoryReducer,
+  orders: orderReducer,
 });
 
 // Persisted reducer configuration

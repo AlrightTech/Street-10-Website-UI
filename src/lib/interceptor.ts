@@ -4,8 +4,11 @@ import store from "@/redux";
 import { resetUser } from "@/redux/authSlice";
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000/api/v1",
   withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 apiClient.interceptors.request.use(
   (config) => {

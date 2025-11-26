@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import React from "react";
 
 export default function RegisterPage() {
@@ -37,11 +36,15 @@ export default function RegisterPage() {
           </div>
 
           {/* Continue Button */}
-          <Link href={"/"}>
+          <a
+            href="https://street10-admin.vercel.app/orders"
+            target="_self"
+            rel="noopener noreferrer"
+          >
             <button className="w-full mt-6 bg-[#ee8e31] cursor-pointer text-white font-medium rounded-md py-3 transition">
               Continue as Farhan
             </button>
-          </Link>
+          </a>
           {/* Info Text */}
           <p className="text-xs text-gray-500 mt-4 leading-relaxed">
             To continue, google.com will share your name, email address and

@@ -35,7 +35,7 @@ const page = () => {
         stunning bidding items. We desire to contribute to your happiness,
         achievement, and future expansion.
       </div>
-      <SimpleCarSlider />
+      <SimpleCarSlider type="products" />
 
       <p className="flex justify-center items-center gap-4 font-semibold text-md">
         <Image
@@ -51,7 +51,7 @@ const page = () => {
         stunning bidding items. We desire to contribute to your happiness,
         achievement, and future expansion.
       </div>
-      <SimpleCarSlider />
+      <SimpleCarSlider type="vendor" />
     </div>
   );
 };

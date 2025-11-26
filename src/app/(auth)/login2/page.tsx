@@ -1,12 +1,41 @@
 // app/auth/page.tsx
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import Image from "next/image";
+import { authApi } from "@/services/auth.api";
+import { toast } from "react-hot-toast";
 
 export default function AuthPage() {
   const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phone) {
+      toast.error("Please enter your phone number");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // Send OTP to phone number
+      await authApi.forgotPassword({ phone });
+      toast.success("OTP sent to your phone");
+      router.push(`/otp2?phone=${encodeURIComponent(phone)}`);
+    } catch (error: unknown) {
+      console.error("Error sending OTP:", error);
+      const errorMessage = error && typeof error === 'object' && 'response' in error 
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message 
+        : undefined;
+      toast.error(errorMessage || "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-[#f4f5f6]">
@@ -28,20 +57,27 @@ export default function AuthPage() {
           Sign In/Up with your phone number
         </h3>
 
-        <input
-          type="tel"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          maxLength={15}
-          placeholder="+974"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className="w-full px-4 py-2 bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#ee8e31] mb-4"
-        />
+        <form onSubmit={handleSubmit}>
+          <input
+            type="tel"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={15}
+            placeholder="+974"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full px-4 py-2 bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#ee8e31] mb-4"
+            disabled={loading}
+          />
 
-        <button className="w-full cursor-pointer bg-[#ee8e31]  text-white py-2 rounded-md font-semibold mb-6">
-          Next
-        </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full cursor-pointer bg-[#ee8e31] text-white py-2 rounded-md font-semibold mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Sending..." : "Next"}
+          </button>
+        </form>
 
         {/* Divider */}
         <p className="text-center text-sm mb-6 text-[#666666]">

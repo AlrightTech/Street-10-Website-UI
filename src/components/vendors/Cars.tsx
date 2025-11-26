@@ -1,131 +1,12 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CategoriesSlider from "../general/CategoriesSlider";
 import Link from "next/link";
-
-const cars = [
-  {
-    price: "300 QAR",
-    icon: "/icons/honda.svg",
-    brand: "Mercedes car",
-    src: "/images/cars/car-1.jpg",
-    bid: "40,000 QAR",
-    end: "4d : 12h : 8m",
-    plate: "Plat no. 12345#",
-    provider: ["Provided by us", "Automatic", "1600 CC"],
-  },
-  {
-    price: "300 QAR",
-    icon: "/icons/tCar.svg",
-    brand: "altarek automative",
-    src: "/images/street/slider-2.jpg",
-    bid: "55,000 QAR",
-    end: "2d : 05h : 30m",
-    plate: "Plat no. 67890#",
-    provider: ["Provided by us", "Manual", "2000 CC"],
-  },
-  {
-    price: "300 QAR",
-    icon: "/icons/honda.svg",
-    brand: "altarek automative",
-    src: "/images/street/slider-3.jpg",
-    bid: "62,000 QAR",
-    end: "6d : 20h : 15m",
-    plate: "Plat no. 54321#",
-    provider: ["Provided by us", "Automatic", "1800 CC"],
-  },
-  {
-    price: "300 QAR",
-    icon: "/icons/honda.svg",
-    brand: "altarek automative",
-    src: "/images/cars/car-4.jpg",
-    bid: "75,000 QAR",
-    end: "1d : 14h : 05m",
-    plate: "Plat no. 24680#",
-    provider: ["Provided by us", "Automatic", "2200 CC"],
-  },
-  {
-    price: "300 QAR",
-    icon: "/icons/honda.svg",
-    brand: "altarek automative",
-    src: "/images/cars/car-2.jpg",
-    bid: "75,000 QAR",
-    end: "1d : 14h : 05m",
-    plate: "Plat no. 24680#",
-    provider: ["Provided by us", "Automatic", "2200 CC"],
-  },
-  {
-    price: "300 QAR",
-    icon: "/icons/honda.svg",
-    brand: "altarek automative",
-    src: "/images/cars/car-3.jpg",
-    bid: "75,000 QAR",
-    end: "1d : 14h : 05m",
-    plate: "Plat no. 24680#",
-    provider: ["Provided by us", "Automatic", "2200 CC"],
-  },
-  {
-    price: "300 QAR",
-    icon: "/icons/honda.svg",
-    brand: "altarek automative",
-    src: "/images/cars/car-1.jpg",
-    bid: "40,000 QAR",
-    end: "4d : 12h : 8m",
-    plate: "Plat no. 12345#",
-    provider: ["Provided by us", "Automatic", "1600 CC"],
-  },
-  {
-    price: "300 QAR",
-    icon: "/icons/honda.svg",
-    brand: "altarek automative",
-    src: "/images/street/slider-2.jpg",
-    bid: "55,000 QAR",
-    end: "2d : 05h : 30m",
-    plate: "Plat no. 67890#",
-    provider: ["Provided by us", "Manual", "2000 CC"],
-  },
-  {
-    price: "300 QAR",
-    icon: "/icons/honda.svg",
-    brand: "altarek automative",
-    src: "/images/street/slider-3.jpg",
-    bid: "62,000 QAR",
-    end: "6d : 20h : 15m",
-    plate: "Plat no. 54321#",
-    provider: ["Provided by us", "Automatic", "1800 CC"],
-  },
-  {
-    price: "300 QAR",
-    icon: "/icons/honda.svg",
-    brand: "altarek automative",
-    src: "/images/cars/car-4.jpg",
-    bid: "75,000 QAR",
-    end: "1d : 14h : 05m",
-    plate: "Plat no. 24680#",
-    provider: ["Provided by us", "Automatic", "2200 CC"],
-  },
-  {
-    price: "300 QAR",
-    icon: "/icons/honda.svg",
-    brand: "altarek automative",
-    src: "/images/cars/car-2.jpg",
-    bid: "75,000 QAR",
-    end: "1d : 14h : 05m",
-    plate: "Plat no. 24680#",
-    provider: ["Provided by us", "Automatic", "2200 CC"],
-  },
-  {
-    price: "300 QAR",
-    icon: "/icons/honda.svg",
-    brand: "altarek automative",
-    src: "/images/cars/car-3.jpg",
-    bid: "75,000 QAR",
-    end: "1d : 14h : 05m",
-    plate: "Plat no. 24680#",
-    provider: ["Provided by us", "Automatic", "2200 CC"],
-  },
-];
+import { productApi } from "@/services/product.api";
+import { vendorApi } from "@/services/vendor.api";
+import type { Product } from "@/services/product.api";
+import type { Vendor } from "@/services/vendor.api";
 
 const category = [
   { title: "All", icon: "/icons/categories.svg" },
@@ -137,16 +18,67 @@ const category = [
 ];
 
 function Cars() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [productsResponse, vendorsResponse] = await Promise.all([
+          productApi.getAll({ status: "active", limit: 20 }),
+          vendorApi.getAll({ status: "approved", limit: 20 }),
+        ]);
+        setProducts(productsResponse.data || []);
+        setVendors(vendorsResponse.data || []);
+      } catch (error) {
+        console.error("Error fetching vendor data:", error);
+        setProducts([]);
+        setVendors([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Create a map of vendor IDs to vendor data
+  const vendorMap = new Map(vendors.map((v) => [v.id, v]));
+
+  // Transform product data to match the car format
+  const cars = products.map((product) => {
+    const price = parseFloat(product.priceMinor) / 100;
+    const vendor = product.vendor?.id ? vendorMap.get(product.vendor.id) : null;
+    return {
+      id: product.id,
+      price: `${price.toLocaleString()} QAR`,
+      icon: "/icons/honda.svg",
+      brand: vendor?.name || product.vendor?.name || "Vendor",
+      src: product.media?.[0]?.url || "/images/cars/car-1.jpg",
+      bid: `${price.toLocaleString()} QAR`,
+      end: "Available",
+      plate: product.title || "Product",
+      provider: ["Provided by us", product.categories?.[0]?.name || "General", "In Stock"],
+    };
+  });
+
   return (
     <section className="pt-5 pb-20 px-4 md:px-10 lg:px-20 relative">
       <CategoriesSlider category={category} />
       {/* Cars Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {cars.map((car, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full"
-          >
+        {loading ? (
+          <div className="col-span-full text-center py-10">
+            <p className="text-gray-500">Loading vendor products...</p>
+          </div>
+        ) : cars.length > 0 ? (
+          cars.map((car, index) => (
+            <div
+              key={car.id || index}
+              className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full"
+            >
             <Link href={"/vendor"}>
               {/* Image Section */}
               <div className="relative w-full flex-shrink-0">
@@ -196,7 +128,12 @@ function Cars() {
               </div>
             </Link>
           </div>
-        ))}
+          ))
+        ) : (
+          <div className="col-span-full text-center py-10">
+            <p className="text-gray-500">No vendor products available</p>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -1,82 +1,55 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { PiClockCounterClockwise } from "react-icons/pi";
-
-const orders = [
-  {
-    id: 29832,
-    status: "Delivered",
-    price: "QAR 1200",
-    date: "15 June 2022",
-    title: "Car GTR 503, art piece by amir.",
-    desc: "Lorem ipsum is a dummy text that ...",
-    items: "4 Items",
-    img: "/images/cars/car-1.jpg",
-  },
-  {
-    id: 29833,
-    status: "Pending",
-    price: "QAR 2200",
-    date: "20 June 2022",
-    title: "Car GTR 700, art piece by ali.",
-    desc: "Lorem ipsum is a dummy text that ...",
-    items: "2 Items",
-    img: "/images/cars/car-2.jpg",
-  },
-  {
-    id: 29834,
-    status: "Cancelled",
-    price: "QAR 1500",
-    date: "25 June 2022",
-    title: "Car GTR 404, art piece by john.",
-    desc: "Lorem ipsum is a dummy text that ...",
-    items: "3 Items",
-    img: "/images/cars/car-1.jpg",
-  },
-  {
-    id: 29834,
-    status: "Pending",
-    price: "QAR 1500",
-    date: "25 June 2022",
-    title: "Car GTR 404, art piece by john.",
-    desc: "Lorem ipsum is a dummy text that ...",
-    items: "3 Items",
-    img: "/images/cars/car-1.jpg",
-  },
-  {
-    id: 29834,
-    status: "Delivered",
-    price: "QAR 1500",
-    date: "25 June 2022",
-    title: "Car GTR 404, art piece by john.",
-    desc: "Lorem ipsum is a dummy text that ...",
-    items: "3 Items",
-    img: "/images/cars/car-1.jpg",
-  },
-  {
-    id: 29834,
-    status: "Delivered",
-    price: "QAR 1500",
-    date: "25 June 2022",
-    title: "Car GTR 404, art piece by john.",
-    desc: "Lorem ipsum is a dummy text that ...",
-    items: "3 Items",
-    img: "/images/cars/car-1.jpg",
-  },
-  {
-    id: 29834,
-    status: "Delivered",
-    price: "QAR 1500",
-    date: "25 June 2022",
-    title: "Car GTR 404, art piece by john.",
-    desc: "Lorem ipsum is a dummy text that ...",
-    items: "3 Items",
-    img: "/images/cars/car-1.jpg",
-  },
-];
+import { orderApi } from "@/services/order.api";
+import type { Order } from "@/services/order.api";
 
 const OrderHistory = () => {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        const response = await orderApi.getUserOrders({ limit: 50 });
+        setOrders(response.data || []);
+      } catch (error) {
+        console.error("Error fetching user orders:", error);
+        setOrders([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  // Transform order data to match the format
+  const transformedOrders = orders.map((order) => {
+    const total = parseFloat(order.totalMinor) / 100;
+    const firstItem = order.items?.[0];
+    const itemCount = order.items?.length || 0;
+    
+    return {
+      id: parseInt(order.orderNumber.replace(/[^0-9]/g, "").substring(0, 6)) || 0,
+      status: order.status === "delivered" ? "Delivered" : 
+              order.status === "cancelled" ? "Cancelled" : 
+              "Pending",
+      price: `QAR ${total.toLocaleString()}`,
+      date: new Date(order.createdAt).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
+      title: firstItem?.product?.title || "Order Items",
+      desc: firstItem?.product?.title || "Order description",
+      items: `${itemCount} ${itemCount === 1 ? "Item" : "Items"}`,
+      img: firstItem?.product?.media?.[0]?.url || "/images/cars/car-1.jpg",
+    };
+  });
+
   return (
     <div className="px-4 md:px-8 pt-6 pb-25 bg-gray-100 min-h-screen">
       <h2 className="text-2xl flex items-center gap-3 font-semibold mb-6">
@@ -106,8 +79,15 @@ const OrderHistory = () => {
             </tr>
           </thead>
           <tbody className="text-gray-700">
-            {orders.map((order, i) => (
-              <tr key={i} className="even:bg-white odd:bg-gray-50">
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="px-4 py-10 text-center">
+                  <p className="text-gray-500">Loading orders...</p>
+                </td>
+              </tr>
+            ) : transformedOrders.length > 0 ? (
+              transformedOrders.map((order, i) => (
+                <tr key={order.id || i} className="even:bg-white odd:bg-gray-50">
                 {/* Order Item */}
                 <td className="px-4 py-5">
                   <div className="flex gap-3 items-center">
@@ -164,7 +144,14 @@ const OrderHistory = () => {
                   {order.date}
                 </td>
               </tr>
-            ))}
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="px-4 py-10 text-center">
+                  <p className="text-gray-500">No orders found</p>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
