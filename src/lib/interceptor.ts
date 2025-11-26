@@ -50,7 +50,21 @@ apiClient.interceptors.response.use(
           break;
       }
     } else {
-      toast.error("Network error. Please check your connection.");
+      // Network error - could be CORS, backend down, or connection issue
+      if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
+        console.error("Network Error Details:", {
+          message: error.message,
+          code: error.code,
+          config: {
+            url: error.config?.url,
+            baseURL: error.config?.baseURL,
+            method: error.config?.method,
+          }
+        });
+        toast.error("Cannot connect to server. Please check if the backend is running and CORS is configured correctly.");
+      } else {
+        toast.error("Network error. Please check your connection.");
+      }
     }
 
     return Promise.reject(error);
