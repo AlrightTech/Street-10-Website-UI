@@ -4,7 +4,7 @@ import store from "@/redux";
 import { resetUser } from "@/redux/authSlice";
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000/api/v1",
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL || "https://street10backend.up.railway.app/api/v1",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

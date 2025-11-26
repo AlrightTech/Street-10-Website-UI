@@ -82,9 +82,11 @@ export default function AuthPage() {
       }
     } catch (error: unknown) {
       console.error("Error verifying OTP:", error);
-      const errorMessage = error && typeof error === 'object' && 'response' in error 
-        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message 
-        : undefined;
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
       toast.error(errorMessage || "Invalid OTP code");
     } finally {
       setLoading(false);
